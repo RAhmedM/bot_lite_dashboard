@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// src/components/Dashboard.tsx
+import { useState } from "react";
 import {
   Activity,
   BarChart4,
@@ -20,168 +21,25 @@ import {
   X,
 } from "lucide-react";
 
-// Component definitions
-const Button = ({ className, variant = "default", size = "default", children, ...props }) => {
-  const baseClasses = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none ring-offset-background";
+// Import UI components from their separate files
+import { Button } from "./ui/button";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "./ui/table";
 
-  const variantClasses = {
-    default: "bg-primary text-primary-foreground hover:bg-primary/90",
-    destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-    outline: "border border-input hover:bg-accent hover:text-accent-foreground",
-    secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    ghost: "hover:bg-accent hover:text-accent-foreground",
-    link: "underline-offset-4 hover:underline text-primary"
-  };
+// Define Select component types and implementation
+interface SelectProps {
+  defaultValue?: string;
+  children?: React.ReactNode;
+  className?: string;
+}
 
-  const sizeClasses = {
-    default: "h-10 py-2 px-4",
-    sm: "h-9 px-3 rounded-md text-sm",
-    lg: "h-11 px-8 rounded-md",
-    icon: "h-10 w-10"
-  };
-
-  const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className || ""}`;
-
-  return (
-    <button className={classes} {...props}>
-      {children}
-    </button>
-  );
-};
-
-const Card = ({ className, children, ...props }) => (
-  <div
-    className={`rounded-lg border bg-card text-card-foreground shadow-sm ${className || ""}`}
-    {...props}
-  >
-    {children}
-  </div>
-);
-
-const CardHeader = ({ className, children, ...props }) => (
-  <div
-    className={`flex flex-col space-y-1.5 p-6 ${className || ""}`}
-    {...props}
-  >
-    {children}
-  </div>
-);
-
-const CardTitle = ({ className, children, ...props }) => (
-  <h3
-    className={`text-lg font-semibold leading-none tracking-tight ${className || ""}`}
-    {...props}
-  >
-    {children}
-  </h3>
-);
-
-const CardDescription = ({ className, children, ...props }) => (
-  <p
-    className={`text-sm text-muted-foreground ${className || ""}`}
-    {...props}
-  >
-    {children}
-  </p>
-);
-
-const CardContent = ({ className, children, ...props }) => (
-  <div className={`p-6 pt-0 ${className || ""}`} {...props}>
-    {children}
-  </div>
-);
-
-const CardFooter = ({ className, children, ...props }) => (
-  <div
-    className={`flex items-center p-6 pt-0 ${className || ""}`}
-    {...props}
-  >
-    {children}
-  </div>
-);
-
-const Badge = ({
-  className,
-  variant = "default",
-  children,
-  ...props
-}) => {
-  const variantClasses = {
-    default: "bg-primary text-primary-foreground hover:bg-primary/80",
-    secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/80",
-    outline: "text-foreground border border-input hover:bg-accent hover:text-accent-foreground"
-  };
-
-  return (
-    <div
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${variantClasses[variant]} ${className || ""}`}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
-
-const Table = ({ className, children, ...props }) => (
-  <div className="relative w-full overflow-auto">
-    <table
-      className={`w-full caption-bottom text-sm ${className || ""}`}
-      {...props}
-    >
-      {children}
-    </table>
-  </div>
-);
-
-const TableHeader = ({ className, children, ...props }) => (
-  <thead className={`border-b ${className || ""}`} {...props}>
-    {children}
-  </thead>
-);
-
-const TableBody = ({ className, children, ...props }) => (
-  <tbody
-    className={`divide-y ${className || ""}`}
-    {...props}
-  >
-    {children}
-  </tbody>
-);
-
-const TableRow = ({ className, children, ...props }) => (
-  <tr
-    className={`border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted ${className || ""}`}
-    {...props}
-  >
-    {children}
-  </tr>
-);
-
-const TableHead = ({ className, children, ...props }) => (
-  <th
-    className={`h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 ${className || ""}`}
-    {...props}
-  >
-    {children}
-  </th>
-);
-
-const TableCell = ({ className, children, ...props }) => (
-  <td
-    className={`p-4 align-middle [&:has([role=checkbox])]:pr-0 ${className || ""}`}
-    {...props}
-  >
-    {children}
-  </td>
-);
-
-const Select = ({ children, defaultValue, ...props }) => {
+const Select: React.FC<SelectProps> = ({ children, defaultValue, className, ...props }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState(defaultValue);
 
   return (
-    <div className="relative" {...props}>
+    <div className={`relative ${className || ""}`} {...props}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -221,7 +79,8 @@ const Select = ({ children, defaultValue, ...props }) => {
     </div>
   );
 };
-const Dashboard = () => {
+
+const Dashboard: React.FC = () => {
   const [refreshTime, setRefreshTime] = useState("2025-02-28 12:09:44");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -307,25 +166,24 @@ const Dashboard = () => {
               <h1 className="text-lg font-semibold">XdialNetworks Dashboard</h1>
             </div>
             <nav className="ml-auto flex items-center gap-4">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="">
                 Reports
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="">
                 Users
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="">
                 Campaigns
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="">
                 Lists
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="">
                 Admin
               </Button>
             </nav>
           </div>
         </header>
-
         <main className="flex-1 overflow-y-auto">
           <div className="w-full max-w-none px-4 py-4 space-y-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -335,11 +193,11 @@ const Dashboard = () => {
               </div>
               <div className="flex flex-wrap items-center gap-2 self-end">
                 <p className="text-sm text-muted-foreground">Last updated: {refreshTime}</p>
-                <Button onClick={handleRefresh} size="sm" variant="outline">
+                <Button onClick={handleRefresh} size="sm" variant="outline" className="">
                   <RefreshCcw className="mr-2 h-4 w-4" />
                   Refresh
                 </Button>
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" className="">
                   <Download className="mr-2 h-4 w-4" />
                   Export
                 </Button>
@@ -351,7 +209,7 @@ const Dashboard = () => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Active Calls</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="">
                   <div className="flex items-center justify-between">
                     <div className="text-3xl font-bold">69</div>
                     <PhoneCall className="h-8 w-8 text-blue-500" />
@@ -364,7 +222,7 @@ const Dashboard = () => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Calls Ringing</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="">
                   <div className="flex items-center justify-between">
                     <div className="text-3xl font-bold">117</div>
                     <PhoneIncoming className="h-8 w-8 text-green-500" />
@@ -377,7 +235,7 @@ const Dashboard = () => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Waiting for Agents</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="">
                   <div className="flex items-center justify-between">
                     <div className="text-3xl font-bold">0</div>
                     <Clock className="h-8 w-8 text-amber-500" />
@@ -390,7 +248,7 @@ const Dashboard = () => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Calls in IVR</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="">
                   <div className="flex items-center justify-between">
                     <div className="text-3xl font-bold">0</div>
                     <PhoneForwarded className="h-8 w-8 text-purple-500" />
@@ -401,11 +259,11 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              <Card>
+              <Card className="">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium">Agents Logged In</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="">
                   <div className="flex items-center gap-2">
                     <Users className="h-5 w-5 text-muted-foreground" />
                     <div className="text-2xl font-bold">23</div>
@@ -413,11 +271,11 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium">Agents In Calls</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="">
                   <div className="flex items-center gap-2">
                     <PhoneCall className="h-5 w-5 text-muted-foreground" />
                     <div className="text-2xl font-bold">18</div>
@@ -425,11 +283,11 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium">Agents Waiting</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="">
                   <div className="flex items-center gap-2">
                     <UserCheck className="h-5 w-5 text-muted-foreground" />
                     <div className="text-2xl font-bold">1</div>
@@ -437,11 +295,11 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium">Agents in Dead Calls</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="">
                   <div className="flex items-center gap-2">
                     <PhoneOff className="h-5 w-5 text-muted-foreground" />
                     <div className="text-2xl font-bold">4</div>
@@ -449,11 +307,11 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium">Agents in Dispo</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="">
                   <div className="flex items-center gap-2">
                     <Activity className="h-5 w-5 text-muted-foreground" />
                     <div className="text-2xl font-bold">0</div>
@@ -463,12 +321,12 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Call Statistics</CardTitle>
-                  <CardDescription>Key performance metrics</CardDescription>
+              <Card className="">
+                <CardHeader className="">
+                  <CardTitle className="">Call Statistics</CardTitle>
+                  <CardDescription className="">Key performance metrics</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="">
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
@@ -504,12 +362,12 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>System Status</CardTitle>
-                  <CardDescription>Current system performance</CardDescription>
+              <Card className="">
+                <CardHeader className="">
+                  <CardTitle className="">System Status</CardTitle>
+                  <CardDescription className="">Current system performance</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="">
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
@@ -550,19 +408,19 @@ const Dashboard = () => {
               </Card>
             </div>
 
-            <Card>
-              <CardHeader>
+            <Card className="">
+              <CardHeader className="">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Agent Status</CardTitle>
-                    <CardDescription>Real-time agent activity</CardDescription>
+                    <CardTitle className="">Agent Status</CardTitle>
+                    <CardDescription className="">Real-time agent activity</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
                     <Select defaultValue="all-active" />
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="">
                 <div className="rounded-md border overflow-x-auto">
                   <Table>
                     <TableHeader>
@@ -664,11 +522,11 @@ const Dashboard = () => {
               </CardFooter>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Agent Status Legend</CardTitle>
+            <Card className="">
+              <CardHeader className="">
+                <CardTitle className="">Agent Status Legend</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                   <div className="flex items-center gap-2">
                     <div className="h-4 w-4 rounded-full bg-red-500"></div>

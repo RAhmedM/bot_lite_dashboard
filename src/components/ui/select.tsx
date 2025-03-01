@@ -1,75 +1,60 @@
-import React, { useState } from "react"
+// src/components/ui/select.tsx
+import React, { useState } from "react";
+import {
+  SelectProps, 
+  SelectTriggerProps, 
+  SelectValueProps, 
+  SelectContentProps, 
+  SelectItemProps
+} from "./types";
 
-const Select = ({ defaultValue, children, ...props }) => {
-  const [value, setValue] = useState(defaultValue)
-  const [open, setOpen] = useState(false)
-  
-  return (
-    <div {...props}>
-      {React.Children.map(children, child => {
-        if (child.type === SelectTrigger) {
-          return React.cloneElement(child, { 
-            value, 
-            onClick: () => setOpen(!open) 
-          })
-        }
-        if (child.type === SelectContent && open) {
-          return React.cloneElement(child, { 
-            value, 
-            onValueChange: (val) => {
-              setValue(val)
-              setOpen(false)
-            }
-          })
-        }
-        return null
-      })}
-    </div>
-  )
-}
-
-const SelectTrigger = ({ className, children, value, ...props }) => {
+const SelectTrigger = ({ className = "", children, value, ...props }: SelectTriggerProps) => {
   return (
     <button
-      className={`flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className || ""}`}
+      className={`flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       {...props}
     >
       {children}
     </button>
-  )
-}
+  );
+};
 
-const SelectValue = ({ placeholder, children, ...props }) => {
-  return <span {...props}>{children || placeholder}</span>
-}
+const SelectValue = ({ placeholder, children, ...props }: SelectValueProps) => {
+  return <span {...props}>{children || placeholder}</span>;
+};
 
-const SelectContent = ({ className, children, value, onValueChange, ...props }) => {
+const SelectContent = ({ className = "", children, value, onValueChange, ...props }: SelectContentProps) => {
   return (
     <div
-      className={`absolute z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md animate-in fade-in-80 ${className || ""}`}
+      className={`absolute z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md animate-in fade-in-80 ${className}`}
       {...props}
     >
       <div className="p-1">
-        {React.Children.map(children, child => {
-          if (child.type === SelectItem) {
-            return React.cloneElement(child, { 
-              selected: child.props.value === value,
-              onSelect: () => onValueChange(child.props.value)
-            })
+        {React.Children.map(children, (child) => {
+          if (!React.isValidElement(child)) return null;
+          
+          // Safely check if this is a SelectItem component
+          const childType = child.type as any;
+          if (childType === SelectItem) {
+            return React.cloneElement(child as React.ReactElement<SelectItemProps>, { 
+              selected: (child.props as any).value === value,
+              onSelect: () => onValueChange?.((child.props as any).value)
+            });
           }
-          return child
+          
+          return child;
         })}
       </div>
     </div>
-  )
-}
+  );
+};
 
-const SelectItem = ({ className, children, value, selected, onSelect, ...props }) => {
+const SelectItem = ({ className = "", children, value, selected, onSelect, ...props }: SelectItemProps) => {
   return (
     <div
       className={`relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground ${
         selected ? "bg-accent" : ""
-      } ${className || ""}`}
+      } ${className}`}
       onClick={onSelect}
       {...props}
     >
@@ -82,7 +67,42 @@ const SelectItem = ({ className, children, value, selected, onSelect, ...props }
       )}
       <span className="truncate">{children}</span>
     </div>
-  )
-}
+  );
+};
 
-export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue }
+// Create a fixed Select component that properly types the children
+const Select = ({ defaultValue, children, ...props }: SelectProps) => {
+  const [value, setValue] = useState(defaultValue);
+  const [open, setOpen] = useState(false);
+  
+  return (
+    <div {...props}>
+      {React.Children.map(children, (child) => {
+        if (!React.isValidElement(child)) return null;
+        
+        const childType = child.type as any;
+        
+        if (childType === SelectTrigger) {
+          return React.cloneElement(child as React.ReactElement<SelectTriggerProps>, { 
+            value, 
+            onClick: () => setOpen(!open) 
+          });
+        }
+        
+        if (childType === SelectContent && open) {
+          return React.cloneElement(child as React.ReactElement<SelectContentProps>, { 
+            value, 
+            onValueChange: (val: string) => {
+              setValue(val);
+              setOpen(false);
+            }
+          });
+        }
+        
+        return child;
+      })}
+    </div>
+  );
+};
+
+export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue };
